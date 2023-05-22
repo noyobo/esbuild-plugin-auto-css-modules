@@ -1,0 +1,28 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`index.test.ts style-loader: __tests__/not-styles/output/index.js 1`] = `
+"(() => {
+  var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
+    get: (a, b) => (typeof require !== "undefined" ? require : a)[b]
+  }) : x)(function(x) {
+    if (typeof require !== "undefined")
+      return require.apply(this, arguments);
+    throw new Error('Dynamic require of "' + x + '" is not supported');
+  });
+
+  // __tests__/not-styles/require.ts
+  var cssModule = __require("./c.css?modules&abc");
+  var cssModule1 = __require("./a/b/c.module.css?modules");
+  var cssModule2 = __require("./a/b/c.modules.css?modules");
+  var lessModule = __require("./c.less?modules");
+  var scssModule = (
+    // Path: __tests__/styles/a/b/c.module.css
+    __require("./c.scss?modules")
+  );
+  __require("./d.css");
+  __require("./d.less");
+  __require("./d.scss");
+})();
+//# sourceMappingURL=index.js.map
+"
+`;
