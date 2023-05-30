@@ -1,4 +1,4 @@
-import { Plugin } from 'esbuild';
+import { Loader, Plugin } from 'esbuild';
 import { readFile } from 'node:fs/promises';
 import * as parser from '@babel/parser';
 import traverse from '@babel/traverse';
@@ -20,7 +20,7 @@ function parseValue(value: string) {
 
 const stylesRegexp = new RegExp(`['"](\.+)\\.(${CSS_EXT_NAMES.map((s) => s.substring(1)).join('|')})(\\?[^'"]*)?['"]`);
 
-export const autoCssModules = (opts: { flag?: string } = {}): Plugin => {
+export const autoCssModules = (opts: { filter?: RegExp, flag?: string, ignore?: RegExp } = {} ): Plugin => {
   function getValue(name: string, query: string) {
     return `${name}?${opts.flag || 'modules'}${query ? `&${query}` : ''}`;
   }
@@ -28,11 +28,20 @@ export const autoCssModules = (opts: { flag?: string } = {}): Plugin => {
   return {
     name: 'auto-css-modules',
     setup(build) {
-      build.onLoad({ filter: /\.([tj]sx?)$/ }, async (args) => {
+
+      build.onLoad({ filter: opts.filter || /\.([tj]sx?)$/ }, async (args) => {
         const isTs = judgeTypeScript(args.path);
         const fileContent = await readFile(args.path, 'utf-8');
 
+        /**
+         * check if the file contains css import
+         */
         if (!stylesRegexp.test(fileContent)) {
+          return null;
+        }
+
+
+        if (opts.ignore && opts.ignore.test(args.path)) {
           return null;
         }
 
@@ -105,7 +114,9 @@ export const autoCssModules = (opts: { flag?: string } = {}): Plugin => {
           ).toString('base64')}`;
         }
 
-        return { contents: code, loader: isTs ? 'ts' : 'js' };
+        const ext = extname(args.path);
+
+        return { contents: code, loader: ext.substring(1) as Loader };
       });
     },
   };
