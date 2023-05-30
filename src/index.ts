@@ -20,7 +20,13 @@ function parseValue(value: string) {
 
 const stylesRegexp = new RegExp(`['"](\.+)\\.(${CSS_EXT_NAMES.map((s) => s.substring(1)).join('|')})(\\?[^'"]*)?['"]`);
 
-export const autoCssModules = (opts: { filter?: RegExp, flag?: string, ignore?: RegExp } = {} ): Plugin => {
+export const autoCssModules = (
+  opts: {
+    filter?: RegExp;
+    flag?: string;
+    ignore?: RegExp | ((filePath: string) => Boolean);
+  } = {},
+): Plugin => {
   function getValue(name: string, query: string) {
     return `${name}?${opts.flag || 'modules'}${query ? `&${query}` : ''}`;
   }
@@ -28,7 +34,6 @@ export const autoCssModules = (opts: { filter?: RegExp, flag?: string, ignore?: 
   return {
     name: 'auto-css-modules',
     setup(build) {
-
       build.onLoad({ filter: opts.filter || /\.([tj]sx?)$/ }, async (args) => {
         const isTs = judgeTypeScript(args.path);
         const fileContent = await readFile(args.path, 'utf-8');
@@ -40,9 +45,14 @@ export const autoCssModules = (opts: { filter?: RegExp, flag?: string, ignore?: 
           return null;
         }
 
-
-        if (opts.ignore && opts.ignore.test(args.path)) {
-          return null;
+        if (opts.ignore) {
+          if ('function' === typeof opts.ignore && opts.ignore(args.path)) {
+            return null;
+          }
+          if (opts.ignore instanceof RegExp && opts.ignore.test(args.path)) {
+            return null;
+          }
+          throw new Error('ignore option must be a function or a regexp');
         }
 
         const ast = parser.parse(fileContent, {

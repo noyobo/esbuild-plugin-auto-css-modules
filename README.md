@@ -44,7 +44,9 @@ import styles from './index.css?modules';
 
 ```ts
 type Options = {
-    flag?: string;
+    filter?: RegExp; // default: /\.([tj]sx?)$/
+    flag?: string; // default: modules
+    ignore?: RegExp | ((filename: string) => boolean); // default: null
 }
 ```
 
