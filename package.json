@@ -4,7 +4,7 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "license": "MIT",
-  "description": "A style loader for esbuild, support for CSS, SCSS, LESS, Stylus, and CSS Modules.",
+  "description": "Automatically import styles filename mark CSS modules. After adding the flag, the build tool can distinguish whether to enable css Modules",
   "homepage": "https://github.com/noyobo/esbuild-plugin-auto-css-modules",
   "repository": {
     "type": "git",
@@ -15,6 +15,9 @@
     "esbuild-loader",
     "esuild-css-modules"
   ],
+  "peerDependencies": {
+    "esbuild": "^0.17.18"
+  },
   "dependencies": {
     "@babel/generator": "^7.21.5",
     "@babel/parser": "^7.21.8",
